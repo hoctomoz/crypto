@@ -12,7 +12,7 @@ string bin_repr(T value) {
     return bitset<sizeof(T)*8>(value).to_string();
 }
 
-block substitution (block b, block S[]);
+block substitution (block b, block permu[]);
 
 block S[16] = { 7, 3, 6, 1, 13, 9, 10, 11, 2, 12, 0, 4, 5, 15, 8, 14 };
 block invS[16] = { 10, 3, 8, 1, 11, 12, 2, 0, 14, 5, 6, 7, 9, 4, 15, 13 };
@@ -47,7 +47,7 @@ void fillL ()
 }
 
 // Encryption part
-block substitution (block b, block S[])
+block substitution (block b, block permu[])
 {
     block mask = 0xF;
     block shift = 0;
@@ -57,7 +57,7 @@ block substitution (block b, block S[])
     {
 	block temp = b & mask;
 	temp = temp >> shift;
-	temp = S[temp];
+	temp = permu[temp];
 	temp = temp << shift;
 	result += temp;
 	shift += 4;
@@ -78,7 +78,7 @@ block permutation (block b)
     return result;
 }
 
-block turn (block b, block key, block S[])
+block turn (block b, block key)
 {
 
     block result = b;
@@ -96,8 +96,8 @@ block encryption (block m, block k0, block k1, block k2)
 
     result = result ^ k0;
 
-    result = turn(result, k1, S);
-    result = turn(result, k2, S);
+    result = turn(result, k1);
+    result = turn(result, k2);
 
     return result;
 }
@@ -114,7 +114,7 @@ block antiPermutation (block b)
     return result;
 }
 
-block turnOver (block b, block key, block S[])
+block turnOver (block b, block key)
 {
 
     block result = b;
@@ -130,8 +130,8 @@ block decryption (block c, block k0, block k1, block k2)
 {
     block result = c;
 
-    result = turnOver(result, k2, invS);
-    result = turnOver(result, k1, invS);
+    result = turnOver(result, k2);
+    result = turnOver(result, k1);
 
     result = result ^ k0;
 
