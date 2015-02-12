@@ -2,6 +2,8 @@
 #include <string>
 #include <bitset>
 #include <stdint.h>
+#include <vector>
+#include <utility>
 
 using namespace std;
 typedef uint32_t block;
@@ -16,35 +18,6 @@ block substitution (block b, block permu[]);
 
 block S[16] = { 7, 3, 6, 1, 13, 9, 10, 11, 2, 12, 0, 4, 5, 15, 8, 14 };
 block invS[16] = { 10, 3, 8, 1, 11, 12, 2, 0, 14, 5, 6, 7, 9, 4, 15, 13 };
-
-// Matrix of linear approximations
-block L[16][16];
-
-bit scalarProduct (block a, block b)
-{
-    bit result = 0;
-
-    block prod = a & b;
-    block mask = 1;
-
-    for (unsigned i = 0; i < 32; i++)
-    {
-	result = result ^ (mask & prod);
-	prod = prod >> 1;
-    }
-
-    return result;
-} 
-
-void fillL ()
-{
-    for (block a = 0; a < 16; a++)
-	for (block b = 0; b < 16; b++)
-	    for (block x = 0; x < 16; x++)
-	    {
-		if (scalarProduct(a,x) == scalarProduct(b,substitution(x,S))) L[a][b]++;
-	    }
-}
 
 // Encryption part
 block substitution (block b, block permu[])
@@ -138,6 +111,47 @@ block decryption (block c, block k0, block k1, block k2)
     return result;
 }
 
+// Matrix of linear approximations
+block L[16][16];
+
+bit scalarProduct (block a, block b)
+{
+    bit result = 0;
+
+    block prod = a & b;
+    block mask = 1;
+
+    for (unsigned i = 0; i < 32; i++)
+    {
+	result = result ^ (mask & prod);
+	prod = prod >> 1;
+    }
+
+    return result;
+}
+
+void fillL ()
+{
+    for (block a = 0; a < 16; a++)
+	for (block b = 0; b < 16; b++)
+	    for (block x = 0; x < 16; x++)
+	    {
+		if (scalarProduct(a,x) == scalarProduct(b,substitution(x,S))) L[a][b]++;
+	    }
+}
+
+// Probabilities approximation
+vector< pair<block,block> >farthestProbas()
+{
+  vector< pair<block,block> > farthest;
+  for (block a = 0; a < 16; a++)
+    for (block b = 0; b < 16; b++)
+      if (L[a][b] == 2 || L[a][b] == 14)
+	farthest.push_back(make_pair(a,b));
+  return farthest;
+}
+
+
 // Main
 int main ()
 {
@@ -152,9 +166,9 @@ int main ()
     cout << bin_repr(m) << endl;
     m = decryption(m,k0,k1,k2);
     cout << bin_repr(m) << endl;
- 
+
    for (unsigned i = 0; i < 16; i++)
-    {	
+    {
 	for (unsigned j = 0; j < 16; j++)
 	{
 	    if (L[i][j] < 10)
@@ -164,5 +178,14 @@ int main ()
 	}
 	cout << endl;
     }
+
+   vector< pair<block,block> > farthest = farthestProbas();
+   for(vector< pair<block,block> >::iterator vect_iter = farthest.begin();
+       vect_iter != farthest.end(); vect_iter++)
+     {
+       cout << '(' << (*vect_iter).first << ',' << (*vect_iter).second << ')' << endl;
+     }
+
+
     return 0;
 }
