@@ -1,0 +1,165 @@
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+\author{Paul Fermé \and Léo Exibard}
+
+\begin{document}
+
+\paragraph{Question 2}
+
+We get the following matrix:
+
+\begin{equation*}
+L = \left(
+\begin{array}{cccccccccccccccc}
+16 & 8 & 8 & 8 & 8 & 8 & 8 & 8 & 8 & 8 & 8 & 8 & 8 & 8 & 8 & 8 \\
+8 & 10 & 8 & 6 & 8 & 14 & 8 & 10 & 10 & 8 & 6 & 8 & 6 & 8 & 10 & 8 \\
+8 & 4 & 8 & 8 & 6 & 10 & 6 & 6 & 8 & 8 & 4 & 8 & 10 & 10 & 6 & 10 \\
+8 & 6 & 8 & 6 & 6 & 8 & 6 & 8 & 10 & 8 & 10 & 8 & 8 & 10 & 8 & 2 \\
+8 & 10 & 8 & 10 & 8 & 6 & 8 & 6 & 14 & 8 & 6 & 8 & 10 & 8 & 10 & 8 \\
+8 & 8 & 4 & 8 & 8 & 8 & 12 & 8 & 8 & 12 & 8 & 8 & 8 & 12 & 8 & 8 \\
+8 & 10 & 4 & 10 & 10 & 8 & 6 & 8 & 6 & 4 & 6 & 8 & 8 & 10 & 8 & 6 \\
+8 & 8 & 8 & 8 & 10 & 10 & 10 & 2 & 8 & 8 & 8 & 8 & 6 & 6 & 6 & 6 \\
+8 & 4 & 6 & 6 & 10 & 6 & 8 & 8 & 8 & 8 & 6 & 10 & 6 & 6 & 12 & 8 \\
+8 & 10 & 6 & 8 & 2 & 8 & 8 & 6 & 6 & 8 & 8 & 10 & 8 & 6 & 10 & 8 \\
+8 & 8 & 10 & 10 & 8 & 8 & 10 & 10 & 8 & 8 & 6 & 14 & 8 & 8 & 6 & 6 \\
+8 & 6 & 10 & 12 & 8 & 10 & 10 & 8 & 6 & 8 & 8 & 6 & 10 & 8 & 12 & 6 \\
+8 & 6 & 6 & 8 & 6 & 8 & 12 & 10 & 10 & 4 & 8 & 6 & 8 & 6 & 6 & 8 \\
+8 & 8 & 10 & 10 & 6 & 6 & 8 & 8 & 8 & 8 & 6 & 6 & 2 & 10 & 8 & 8 \\
+8 & 6 & 6 & 12 & 8 & 10 & 6 & 8 & 10 & 8 & 12 & 10 & 6 & 8 & 8 & 10 \\
+8 & 8 & 10 & 6 & 8 & 8 & 10 & 6 & 8 & 4 & 10 & 10 & 8 & 12 & 10 & 10
+\end{array}
+\right)
+\end{equation*}
+
+\paragraph{Question 3} 
+
+The farthest probabilities from $\frac{1}{2}$ are:
+
+\begin{equation*}
+\begin{array}{|c|c|}
+\hline
+(a,b) & p_{a,b} \\
+\hline
+\hline
+(0,0) & 1 \\
+\hline
+(1,5) & 0.875 \\
+\hline
+(3,15) & 0.125 \\
+\hline
+(4,8) & 0.875 \\
+\hline
+(7,7) & 0.125 \\
+\hline
+(9,4) & 0.125 \\
+\hline
+(10,11) & 0.875 \\
+\hline
+(13,12) & 0.125 \\
+\hline
+\end{array}
+\end{equation*}
+
+The $(0,0)$ couple is not useful, since $0=0$ is a trivial equation which does not give any information.
+
+\paragraph{Question 4}
+
+Experimentally, we have:
+
+\begin{itemize}
+
+\item With the $K_0, K_1$ of Question 1, we have:
+
+\begin{equation*}
+\begin{array}{|c|c|}
+\hline
+(a,b) & Pr(A.m = P(B).x_1) \\
+\hline
+\hline
+(1,5) & 0.125 \\
+\hline
+(3,15) & 0.875 \\
+\hline
+(4,8) & 0.125 \\
+\hline
+(7,7) & 0.125 \\
+\hline
+(9,4) & 0.125 \\
+\hline
+(10,11) & 0.125 \\
+\hline
+(13,12) & 0.875 \\
+\hline
+\end{array}
+\end{equation*}
+
+\item With the $K_1, K_2$ of Question 2, we have:
+
+\begin{equation*}
+\begin{array}{|c|c|}
+\hline
+(a,b) & Pr(A.m = P(B).x_1) \\
+\hline
+\hline
+(1,5) & 0.875 \\
+\hline
+(3,15) & 0.125 \\
+\hline
+(4,8) & 0.875 \\
+\hline
+(7,7) & 0.125 \\
+\hline
+(9,4) & 0.125 \\
+\hline
+(10,11) & 0.875 \\
+\hline
+(13,12) & 0.125 \\
+\hline
+\end{array}
+\end{equation*}
+
+\end{itemize}
+
+We want to prove that $A.m = P(B).x_1 \text{ w.p. } \dfrac{1}{2} \pm \dfrac{6}{16}$:
+
+We know that $x_1 = K_1 + P(S(m + K_0))$.
+
+\begin{itemize}
+
+\item Case 1: $A . K_0 = B . P^{-1}(K_1)$. We have:
+
+\begin{align*}
+P(B).x_1 &= B.(P^{-1}(x_1)) \\
+	&= B.(P^{-1}(K_1 + P(S(m + K_0)))) \\
+	&= B.P^{-1}(K_1) + B.S(m + K_0) \text{ since $P$ is linear} \\
+	&= A.K_0 + B.S(m + K_0) \\
+	&= A.K_0 + A.(m + K_0) \text{ w.p. $p_{a,b}$} \\
+	&= A.m \text{ w.p. $p_{a,b}$}
+\end{align*}
+
+\item Case 2: $A . K_0 = 1 - (B . P^{-1}(K_1))$. We have:
+
+\begin{align*}
+P(B).x_1 &= B.(P^{-1}(x_1)) \\
+	&= B.(P^{-1}(K_1 + P(S(m + K_0)))) \\
+	&= B.P^{-1}(K_1) + B.S(m + K_0) \text{ since $P$ is linear} \\
+	&= 1 - A.K_0 + B.S(m + K_0) \\
+	&= 1 - A.K_0 + A.(m + K_0) \text{ w.p. $p_{a,b}$} \\
+	&= 1 - A.m \text{ w.p. $p_{a,b}$}
+\end{align*}
+
+So $P(B).x_1 = A.m$ w.p. $1 - p_{a,b}$
+
+Since $p_{a,b}, 1 - p_{a,b} = \dfrac{1}{2} \pm \dfrac{6}{16}$, we finally have:
+
+\begin{equation*}
+A.m = P(B).x_1 \text{ w.p. } \dfrac{1}{2} \pm \dfrac{6}{16}
+\end{equation*}
+
+
+\end{itemize}
+
+\end{document}
