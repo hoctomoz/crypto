@@ -19,6 +19,7 @@ block substitution (block b, block permu[]);
 block S[16] = { 7, 3, 6, 1, 13, 9, 10, 11, 2, 12, 0, 4, 5, 15, 8, 14 };
 block invS[16] = { 10, 3, 8, 1, 11, 12, 2, 0, 14, 5, 6, 7, 9, 4, 15, 13 };
 
+// Question 1
 // Encryption part
 block substitution (block b, block permu[])
 {
@@ -111,7 +112,7 @@ block decryption (block c, block k0, block k1, block k2)
     return result;
 }
 
-// Matrix of linear approximations
+// Question 2 : matrix L of linear approximations
 block L[16][16];
 
 bit scalarProduct (block a, block b)
@@ -140,19 +141,41 @@ void fillL ()
 	    }
 }
 
-// Probabilities approximation
-vector< pair<block,block> >farthestProbas()
+// Question 3
+vector< pair<block,block> > farthestProbas()
+// Return list of indices (a,b) s.t. p[a,b] = 1/2 +/- 6/16 (the farthest probas)
 {
-  vector< pair<block,block> > farthest;
-  for (block a = 0; a < 16; a++)
-    for (block b = 0; b < 16; b++)
-      if (L[a][b] == 2 || L[a][b] == 14)
-	farthest.push_back(make_pair(a,b));
-  return farthest;
+    vector< pair<block,block> > farthest;
+    for (block a = 0; a < 16; a++)
+	for (block b = 0; b < 16; b++)
+	    if (L[a][b] == 2 || L[a][b] == 14) // We know that the farthest probas have value 2/16 or 14/16
+		farthest.push_back(make_pair(a,b));
+    return farthest;
+}
+
+// Question 4
+double experimentalTest(block a, block b, block k0, block k1)
+{
+    block result = 0;
+
+    for (block m = 0; m < 0xFFFFFFF; m++)
+    {
+	block x1 = turn(m^k0,k1);
+
+	if (scalarProduct(a,m) == scalarProduct(permutation(b),x1))
+	    result++;
+    }
+
+    block x1 = turn(0xFFFFFFFF^k0,k1);
+    if (scalarProduct(a,0xFFFFFFFF) == scalarProduct(permutation(b),x1))
+	result++;
+
+    return ((double) result) / (((double) 0xFFFFFFF) + 1);
 }
 
 
 // Main
+
 int main ()
 {
     fillL();
@@ -162,12 +185,16 @@ int main ()
     block k1 = 0xFFFFFFFF;
     block k2 = 0x7FFFFFFE;
 
+    cout << "Question 1 :\n";
+
     m = encryption(m,k0,k1,k2);
     cout << bin_repr(m) << endl;
     m = decryption(m,k0,k1,k2);
     cout << bin_repr(m) << endl;
 
-   for (unsigned i = 0; i < 16; i++)
+    cout << "\nQuestion 2 :\n";
+
+    for (unsigned i = 0; i < 16; i++)
     {
 	for (unsigned j = 0; j < 16; j++)
 	{
@@ -179,13 +206,20 @@ int main ()
 	cout << endl;
     }
 
-   vector< pair<block,block> > farthest = farthestProbas();
-   for(vector< pair<block,block> >::iterator vect_iter = farthest.begin();
-       vect_iter != farthest.end(); vect_iter++)
-     {
-       cout << '(' << (*vect_iter).first << ',' << (*vect_iter).second << ')' << endl;
-     }
+    vector< pair<block,block> > farthest = farthestProbas();
 
+    cout << "\nQuestion 3 :\n";
+    
+    for(auto p : farthest)
+	cout << '(' << p.first << ',' << p.second << ')' << endl;
+
+    /*cout << "\nQuestion 4 :\n";
+
+    for (auto p : farthest)
+	cout << experimentalTest(p.first, p.second, k0, k1) << endl;
+
+    for (auto p : farthest)
+    cout << experimentalTest(p.first, p.second, k1, k2) << endl;*/
 
     return 0;
 }

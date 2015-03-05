@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS =-g -O2 -Wall -Wshadow -Wcast-align \
+CFLAGS =-std=c++0x -g -O2 -Wall -Wshadow -Wcast-align \
 	-Wredundant-decls \
 	-Wpointer-arith -Wwrite-strings -finline-functions
 EXEC = crypto
