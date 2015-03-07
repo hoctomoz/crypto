@@ -394,6 +394,24 @@ block toBlock(vector<bit> m)
     return b;
 }
 
+vector<bit> fromBlock(block b)
+{
+    block m = b;
+    vector<bit> result;
+    block mask = 1 << 31;
+
+    for (unsigned i = 0; i < 32; i++)
+    {
+	if (mask == mask & b) 
+	    result.push_back(1);
+	else
+	    result.push_back(0);
+	mask = mask >> 1;
+    }
+
+    return result;
+}
+
 block findClosestKeyWithOneActiveBox(unsigned position, block a, block b, vector<vector<bit>>& plaintext, vector<vector<bit>>& ciphertext)
 {
     // position is the position of the only active box
@@ -493,8 +511,8 @@ block breakWithTwoActiveBoxes(block a, block b, vector<vector<bit>>& plaintext, 
 }
 
 // Question 9
-vector<unsigned> k0FromK = { };
-vector<unsigned> k1FromK = { };
+vector<unsigned> k0FromK = { 17, 31, 0, 0, 18, 7, 20, 18, 8, 1, 27, 27, 2, 4, 11, 20, 25, 13, 17, 10, 24, 9, 29, 15, 21, 18, 28, 20, 4, 5, 24, 15 };
+vector<unsigned> k1FromK = { 15, 2, 5, 0, 13, 31, 5, 10, 18, 2, 3, 14, 1, 0, 11, 1, 20, 15, 14, 27, 6, 11, 19, 3, 6, 20, 14, 2, 28, 11, 5, 8 };
 vector<unsigned> k2FromK = { 4, 24, 23, 12, 22, 21, 31, 15, 29, 1, 0, 26, 17, 24, 16, 5, 31, 0, 20, 21, 26, 30, 15, 11, 16, 23, 18, 30, 30, 19, 28, 23 };
 
 // Main
