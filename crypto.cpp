@@ -401,7 +401,7 @@ vector<bit> fromBlock(block b)
 
     for (unsigned i = 0; i < 32; i++)
     {
-	if (mask == (mask & b)) 
+	if (mask == (mask & b))
 	    result.push_back(1);
 	else
 	    result.push_back(0);
@@ -436,7 +436,7 @@ block findClosestKeyWithOneActiveBox(unsigned position, block a, block b, vector
 	    if (scalarProduct(a,m) == scalarProduct(permutation(b),x1))
 		proba++;
 	}
-	
+
 	double score = ((double) proba) / plaintext.size();
 	double diff = min(abs(score - 0.875),abs(score - 0.125));
 
@@ -485,7 +485,7 @@ block findClosestKeyWithTwoActiveBoxes(unsigned position, block a, block b, vect
 	    if (scalarProduct(a,m) == scalarProduct(permutation(b),x1))
 		proba++;
 	}
-	
+
 	double score = ((double) proba) / plaintext.size();
 	double diff = min(abs(score - 0.875),abs(score - 0.125));
 
@@ -514,9 +514,34 @@ vector<unsigned> k0FromK = { 17, 31, 0, 0, 18, 7, 20, 18, 8, 1, 27, 27, 2, 4, 11
 vector<unsigned> k1FromK = { 15, 2, 5, 0, 13, 31, 5, 10, 18, 2, 3, 14, 1, 0, 11, 1, 20, 15, 14, 27, 6, 11, 19, 3, 6, 20, 14, 2, 28, 11, 5, 8 };
 vector<unsigned> k2FromK = { 4, 24, 23, 12, 22, 21, 31, 15, 29, 1, 0, 26, 17, 24, 16, 5, 31, 0, 20, 21, 26, 30, 15, 11, 16, 23, 18, 30, 30, 19, 28, 23 };
 
+vector<unsigned> unknownsInK2 = {2, 3, 6, 7, 8, 9, 10, 13, 14, 25, 27};
+
+vector<block> blockPlaintext(Plaintext.size());
+vector<block> blockCiphertext(Ciphertext.size());
+
+block verify(block k0, block k1, block k2)
+{
+  bool found = true;
+  unsigned i = 0;
+  while(found && i < blockPlaintext.size())
+    {
+      if (decryption(encryption(blockPlaintext[i], k0, k1, k2), k0, k1, k2) != blockPlaintext[i])
+	found = false;
+    }
+  return found;
+}
+
+block getBitsFromK2(block k2)
+{
+  block k = 0;
+  for (unsigned position : k2FromK)
+      k = k | (1 << position);
+  return k;
+}
+
 block findK(block m, block c, block k2)
 {
-    block k = 0;
+  block k = getBitsFromK2(k2);
 
     //TODO
 
@@ -527,6 +552,12 @@ block findK(block m, block c, block k2)
 int main ()
 {
     fillL();
+
+    for (auto bits : Plaintext)
+      blockPlaintext.push_back(toBlock(bits));
+    for (auto bits : Ciphertext)
+      blockCiphertext.push_back(toBlock(bits));
+
 
     block m = 0;
     block k0 = 0x80000001;
@@ -586,6 +617,8 @@ int main ()
     cout << "With (7,7), we find k2 = " << bin_repr(breakWithTwoActiveBoxes(7, 7, Plaintext, Ciphertext)) << endl;
     cout << "With (10,11), we find k2 = " << bin_repr(breakWithTwoActiveBoxes(10, 11, Plaintext, Ciphertext)) << endl;
 
+    cout << "Test" << endl;
+    cout << bin_repr(getBitsFromK2(0xFFFFFFFF)) << endl;
 
    return 0;
 }
