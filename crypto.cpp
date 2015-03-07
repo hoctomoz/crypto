@@ -493,7 +493,9 @@ block breakWithTwoActiveBoxes(block a, block b, vector<vector<bit>>& plaintext, 
 }
 
 // Question 9
-vector<unsigned> kFromK2 = { 4, 24, 23, 12, 22, 21, 31, 15, 29, 1, 0, 26, 17, 24, 16, 5, 31, 0, 20, 21, 26, 30, 15, 11, 16, 23, 18, 30, 30, 19, 28, 23 };
+vector<unsigned> k0FromK = { };
+vector<unsigned> k1FromK = { };
+vector<unsigned> k2FromK = { 4, 24, 23, 12, 22, 21, 31, 15, 29, 1, 0, 26, 17, 24, 16, 5, 31, 0, 20, 21, 26, 30, 15, 11, 16, 23, 18, 30, 30, 19, 28, 23 };
 
 // Main
 int main ()
