@@ -208,6 +208,7 @@ We get the following table:
   \end{array}
 \end{equation*}
 
+<<<<<<< Updated upstream
 \paragraph{Question 9}
 
 From $K_2$, we deduce 21 bits of $K$. We simply bruteforce the 10 remaining unknown in $\mathcal{O}(2^{10})$ operations. We get:
@@ -223,3 +224,17 @@ $
 
 
  \end{document}
+=======
+\paragraph{Question 7}
+With one active box, working on the first position with the couple (4,8), we find the bits 2,3,4,5 of k2 : 0111.
+
+With two active boxes, working on the first position with the couple (10,11), we find the bits 2,...,9 of k2 : 01110000.
+
+\paragraph{Question 8}
+With one active box with the couple (4,8) or with two active boxes with the couple
+(10,11), we find k2 = 10011100000110110001100110100100.
+(We have other values with the other couples, but the last step of the algorithm (question
+9) shows that this only value of k2 works).
+
+\end{document}
+>>>>>>> Stashed changes
