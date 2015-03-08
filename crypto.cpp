@@ -651,7 +651,7 @@ int main ()
 
 
     cout << "\nQuestion 4 :\n";
-    cout << "This code has been commented, since the computation is a bit long: we have chosen to compute the exact probability (2^32 is not too large)" << endl;
+    cout << "This code has been commented, since the computation is a bit long: we have chosen to compute the exact probability (2^32 is not too large). The results are in the report." << endl;
     /*  for (auto p : farthest)
 	cout << experimentalTest(p.first << 28, p.second << 28, k0, k1) << endl;
 
@@ -667,8 +667,8 @@ int main ()
     couplesOneBox.push_back(pair<block,block> (9,4));
     couplesOneBox.push_back(pair<block,block> (13,12));
 
-    cout << "Working on the first position, we find the bits 2,3,4,5 (beginning in the left with 0th bit) of k2 : " << bin_repr(findClosestKeyWithOneActiveBox(0, couplesOneBox[0])) << endl;
-    cout << "In all, we find k2 = " << bin_repr(breakWithOneActiveBox(couplesOneBox[0])) << endl;
+    cout << "Working on the first position with the couple (4,8), we find the bits 2,3,4,5 (beginning in the left with 0th bit) of k2 : " << bin_repr(findClosestKeyWithOneActiveBox(0, couplesOneBox[0])) << endl;
+    cout << "In all, using the couple (4,8), we find k2 = " << bin_repr(breakWithOneActiveBox(couplesOneBox[0])) << endl;
 
 
     // (1,5), (3,15), (7,7) and (10,11) are couples giving two active boxes
@@ -680,8 +680,8 @@ int main ()
     couplesTwoBoxes.push_back(pair<block,block> (7,7));
     couplesTwoBoxes.push_back(pair<block,block> (10,11));
 
-    cout << "Working on the first position, we find the bits 0,...,7 (beginning in the left with 0th bit) of k2 : " << bin_repr(findClosestKeyWithTwoActiveBoxes(0, couplesTwoBoxes[3])) << endl;
-    cout << "In all, we find k2 = " << bin_repr(breakWithTwoActiveBoxes(couplesTwoBoxes[3])) << endl;
+    cout << "Working on the first position with the couple (10,11), we find the bits 2,...,9 (beginning in the left with 0th bit) of k2 : " << bin_repr(findClosestKeyWithTwoActiveBoxes(0, couplesTwoBoxes[3])) << endl;
+    cout << "In all, using the couple (10,11), we find k2 = " << bin_repr(breakWithTwoActiveBoxes(couplesTwoBoxes[3])) << endl;
 
     cout << "\nQuestion 9:\n";
     block k2test = breakWithOneActiveBox(couplesOneBox[0]);
