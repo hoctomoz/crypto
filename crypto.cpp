@@ -518,9 +518,12 @@ vector<unsigned> k2FromK = { 4, 24, 23, 12, 22, 21, 31, 15, 29, 1, 0, 26, 17, 24
 block getK0FromK(block k)
 {
   block k0 = 0;
+  block mask = 1 << 31;
   for (unsigned position : k0FromK)
     {
-      k0 = k0 | (k & (1 << position));
+      if (k >> (31 - position) & 1)
+	k0 |= mask;
+      mask = mask >> 1;
     }
   return k0;
 }
@@ -528,59 +531,81 @@ block getK0FromK(block k)
 block getK1FromK(block k)
 {
   block k1 = 0;
+  block mask = 1 << 31;
   for (unsigned position : k1FromK)
     {
-      k1 = k1 | (k & (1 << position));
+      if (k >> (31 - position) & 1)
+	k1 |= mask;
+      mask = mask >> 1;
     }
   return k1;
-}
-
-vector<unsigned> unknownInK2 = {2, 3, 6, 7, 8, 9, 10, 13, 14, 25, 27};
-unsigned total_unknown = unknownInK2.size();
-
-vector<block> blockPlaintext(Plaintext.size());
-vector<block> blockCiphertext(Ciphertext.size());
-
-block verify(block k0, block k1, block k2)
-{
-  bool found = true;
-  unsigned i = 0;
-  while(found && i < blockPlaintext.size())
-    {
-      if (decryption(encryption(blockPlaintext[i], k0, k1, k2), k0, k1, k2) != blockPlaintext[i])
-	found = false;
-    }
-  return found;
 }
 
 /* Retrieves all the bits that can be deduced from k2. Unknown bits are left to 0. */
 block getBitsFromK2(block k2)
 {
   block k = 0;
+  block mask = 1 << 31;
   for (unsigned position : k2FromK)
-      k = k | (1 << position);
+    {
+      if (k2 & mask)
+	{
+	  k |= 1 << (31 - position);
+	}
+      mask = mask >> 1;
+    }
   return k;
 }
 
-/* This recursive function explores all the possibilities given by the vector unknownInK2 */
-block bruteforce(unsigned current_unknown, block current_k, block k2)
+
+vector<unsigned> unknownInK2 = {2, 3, 6, 7, 8, 9, 10, 13, 14, 25, 27};
+unsigned total_unknown = unknownInK2.size();
+
+vector<block> blockPlaintext;
+vector<block> blockCiphertext;
+
+bool verify(block k0, block k1, block k2)
 {
-  //TODO
+  unsigned i = 0;
+  bool found = true;
+  while (found && i < blockPlaintext.size())
+    {
+      if (decryption(blockCiphertext[i], k0, k1, k2) != blockPlaintext[i])
+	found = false;
+      i++;
+    }
+  return found;
+}
+
+/* This recursive function explores all the possibilities given by the vector unknownInK2 */
+int bruteforce(unsigned current_unknown, block current_k, block k2)
+{
   if (current_unknown == total_unknown)
     {
       block k0 = getK0FromK(current_k);
       block k1 = getK1FromK(current_k);
+      if (verify(k0, k1, k2))
+	return current_k;
+      else
+	return (-1);
     }
-  return 0;
-
+  else
+    {
+      int k = bruteforce(current_unknown + 1, current_k | (1 << (31 - unknownInK2[current_unknown])), k2);
+      if (k == -1)
+	return (bruteforce(current_unknown + 1, current_k & (~(1 << (31 - unknownInK2[current_unknown]))), k2));
+      else
+	return k;
+    }
 }
 
-block findK(block m, block c, block k2)
+block findK(block k2)
 {
-  block k = getBitsFromK2(k2);
-
-    //TODO
-
+  block initial_k = getBitsFromK2(k2);
+  int k = bruteforce(0, initial_k, k2);
+  if (k == -1)
+    throw runtime_error("Failed to find K");
+  else
     return k;
 }
 
@@ -667,9 +692,18 @@ int main ()
     cout << "With (10,11), we find k2 = " << bin_repr(potentialK2s[6]) << endl;
 
     cout << "\nQuestion 9:\n";
-    cout << "Test" << endl;
-    cout << bin_repr(getBitsFromK2(0xFFFFFFFF)) << endl;
-    //cout << verify()
+
+    block k = findK(potentialK2s[0]);
+
+    cout << "We find k = " << bin_repr(k) << endl <<
+            "Consequently, " << endl <<
+            "k0 = " << bin_repr(getK0FromK(k)) << endl <<
+            "k1 = " << bin_repr(getK1FromK(k)) << endl <<
+            "k2 = " << bin_repr(potentialK2s[0]) << endl;
+
+
+
+    //cout << verify(0b10001101101101100011010011001100, 0b00100011101000100001011100000111, 0b10011100000110110001100110100100) << endl;
 
    return 0;
 }
