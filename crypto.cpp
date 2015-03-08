@@ -603,20 +603,33 @@ int main ()
     */
 
     cout << "\nQuestion 5-6-7-8:\n";
+    vector<block> potentialK2s;
+
     // (4,8), (9,4) and (13,12) are couples giving only one active box
     cout << "Method with one active box:\n";
     cout << "With (4,8), working on the first position, we find the bits 2,3,4,5 (beginning in the left with 0th bit) of k2 : " << bin_repr(findClosestKeyWithOneActiveBox(0, 4<<28, 8<<28, Plaintext, Ciphertext)) << endl;
-    cout << "With (4,8), we find k2 = " << bin_repr(breakWithOneActiveBox(4, 8, Plaintext, Ciphertext)) << endl;
-    cout << "With (9,4), we find k2 = " << bin_repr(breakWithOneActiveBox(9, 4, Plaintext, Ciphertext)) << endl;
-    cout << "With (13,12), we find k2 = " << bin_repr(breakWithOneActiveBox(13, 12, Plaintext, Ciphertext)) << endl;
+
+    potentialK2s.push_back(breakWithOneActiveBox(4, 8, Plaintext, Ciphertext));
+    potentialK2s.push_back(breakWithOneActiveBox(9, 4, Plaintext, Ciphertext));
+    potentialK2s.push_back(breakWithOneActiveBox(13, 12, Plaintext, Ciphertext));
+    
+    cout << "With (4,8), we find k2 = " << bin_repr(potentialK2s[0]) << endl;
+    cout << "With (9,4), we find k2 = " << bin_repr(potentialK2s[1]) << endl;
+    cout << "With (13,12), we find k2 = " << bin_repr(potentialK2s[2]) << endl;
 
     // (1,5), (3,15), (7,7) and (10,11) are couples giving two active boxes
     cout << "\nMethod with two active boxes:\n";
     cout << "With (1,5), working on the first position, we find the bits 0,...,7 (beginning in the left with 0th bit) of k2 : " << bin_repr(findClosestKeyWithTwoActiveBoxes(0, 1<<28, 5<<28, Plaintext, Ciphertext)) << endl;
-    cout << "With (1,5), we find k2 = " << bin_repr(breakWithTwoActiveBoxes(1, 5, Plaintext, Ciphertext)) << endl;
-    cout << "With (3,15), we find k2 = " << bin_repr(breakWithTwoActiveBoxes(3, 15, Plaintext, Ciphertext)) << endl;
-    cout << "With (7,7), we find k2 = " << bin_repr(breakWithTwoActiveBoxes(7, 7, Plaintext, Ciphertext)) << endl;
-    cout << "With (10,11), we find k2 = " << bin_repr(breakWithTwoActiveBoxes(10, 11, Plaintext, Ciphertext)) << endl;
+
+    potentialK2s.push_back(breakWithTwoActiveBoxes(1, 5, Plaintext, Ciphertext));
+    potentialK2s.push_back(breakWithTwoActiveBoxes(3, 15, Plaintext, Ciphertext));
+    potentialK2s.push_back(breakWithTwoActiveBoxes(7, 7, Plaintext, Ciphertext));
+    potentialK2s.push_back(breakWithTwoActiveBoxes(10, 11, Plaintext, Ciphertext));
+  
+    cout << "With (1,5), we find k2 = " << bin_repr(potentialK2s[3]) << endl;
+    cout << "With (3,15), we find k2 = " << bin_repr(potentialK2s[4]) << endl;
+    cout << "With (7,7), we find k2 = " << bin_repr(potentialK2s[5]) << endl;
+    cout << "With (10,11), we find k2 = " << bin_repr(potentialK2s[6]) << endl;
 
     cout << "\nQuestion 9:\n";
     cout << "Test" << endl;
