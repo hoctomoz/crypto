@@ -696,14 +696,10 @@ int main ()
     block k = findK(potentialK2s[0]);
 
     cout << "We find k = " << bin_repr(k) << endl <<
-            "Consequently, " << endl <<
+            "So, " << endl <<
             "k0 = " << bin_repr(getK0FromK(k)) << endl <<
             "k1 = " << bin_repr(getK1FromK(k)) << endl <<
             "k2 = " << bin_repr(potentialK2s[0]) << endl;
-
-
-
-    //cout << verify(0b10001101101101100011010011001100, 0b00100011101000100001011100000111, 0b10011100000110110001100110100100) << endl;
 
    return 0;
 }
