@@ -431,11 +431,11 @@ block findClosestKeyWithOneActiveBox(unsigned position, pair<block,block> p)
 	    block m = toBlock(Plaintext[i]);
 	    block c = toBlock(Ciphertext[i]);
 	    block x1 = turnOver(c, key);
-		
+
 	    if (scalarProduct(p.first << 4*(7-position),m) == scalarProduct(permutation(p.second << 4*(7-position)),x1))
 		proba++;
 	}
-	
+
 	double score = ((double) proba) / Plaintext.size();
 	double diff = min(abs(score - 0.875),abs(score - 0.125));
 
@@ -443,12 +443,12 @@ block findClosestKeyWithOneActiveBox(unsigned position, pair<block,block> p)
 	{
 	    bestKey = key;
 	    bestScore = diff;
-	}	
+	}
     }
 
     return bestKey;
 }
-				     
+
 block breakWithOneActiveBox(pair<block,block> p)
 {
     block key = 0;
@@ -483,10 +483,10 @@ block findClosestKeyWithTwoActiveBoxes(unsigned position, pair<block,block> p)
 	    if (scalarProduct(p.first << 4*(7-position),m) == scalarProduct(permutation(p.second << 4*(7-position)),x1))
 		proba++;
 	}
-	
+
 	double score = ((double) proba) / Plaintext.size();
 	double diff = min(abs(score - 0.875),abs(score - 0.125));
-	
+
 	if (diff < bestScore)
 	{
 	    bestKey = key;
@@ -679,7 +679,7 @@ int main ()
     couplesTwoBoxes.push_back(pair<block,block> (3,15));
     couplesTwoBoxes.push_back(pair<block,block> (7,7));
     couplesTwoBoxes.push_back(pair<block,block> (10,11));
-    
+
     cout << "Working on the first position, we find the bits 0,...,7 (beginning in the left with 0th bit) of k2 : " << bin_repr(findClosestKeyWithTwoActiveBoxes(0, couplesTwoBoxes[3])) << endl;
     cout << "In all, we find k2 = " << bin_repr(breakWithTwoActiveBoxes(couplesTwoBoxes[3])) << endl;
 
@@ -691,7 +691,7 @@ int main ()
             "So, " << endl <<
             "k0 = " << bin_repr(getK0FromK(k)) << endl <<
             "k1 = " << bin_repr(getK1FromK(k)) << endl <<
-            "k2 = " << bin_repr(potentialK2s[0]) << endl;
+            "k2 = " << bin_repr(k2test) << endl;
 
    return 0;
 }
