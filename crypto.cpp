@@ -515,12 +515,12 @@ vector<unsigned> k2FromK = { 4, 24, 23, 12, 22, 21, 31, 15, 29, 1, 0, 26, 17, 24
 block getK0FromK(block k)
 {
     block k0 = 0;
-    block mask = 1 << 31;
+    block mask = 1 << 31; // will be used to set the i-th bit of k0, for 0 <= i <= 31
     for (unsigned position : k0FromK)
     {
-	if (k >> (31 - position) & 1)
-	    k0 |= mask;
-	mask = mask >> 1;
+	if (k >> (31 - position) & 1) // we get k's position-th bit
+	    k0 |= mask; // we set k0's i-th bit (default is 0)
+	mask = mask >> 1; // i++
     }
     return k0;
 }
@@ -528,12 +528,12 @@ block getK0FromK(block k)
 block getK1FromK(block k)
 {
     block k1 = 0;
-    block mask = 1 << 31;
+    block mask = 1 << 31; // will be used to set the i-th bit of k1, for 0 <= i <= 31
     for (unsigned position : k1FromK)
     {
-	if (k >> (31 - position) & 1)
-	    k1 |= mask;
-	mask = mask >> 1;
+	if (k >> (31 - position) & 1) // we get k's position-th bit
+	    k1 |= mask; // we set k1's i-th bit (default is 0)
+	mask = mask >> 1; // i++
     }
     return k1;
 }
@@ -542,25 +542,26 @@ block getK1FromK(block k)
 block getBitsFromK2(block k2)
 {
     block k = 0;
-    block mask = 1 << 31;
+    block mask = 1 << 31; // will be used to set the i-th bit of k, for 0 <= i <= 31
     for (unsigned position : k2FromK)
     {
-	if (k2 & mask)
+	if (k2 & mask) // we get k2's i-th bit
 	{
-	    k |= 1 << (31 - position);
+	    k |= 1 << (31 - position); // we set k's position-th bit (default is 0)
 	}
-	mask = mask >> 1;
+	mask = mask >> 1; // i++
     }
     return k;
 }
 
 
-vector<unsigned> unknownInK2 = {2, 3, 6, 7, 8, 9, 10, 13, 14, 25, 27};
+vector<unsigned> unknownInK2 = {2, 3, 6, 7, 8, 9, 10, 13, 14, 25, 27}; // positions of unknown bits in K
 unsigned total_unknown = unknownInK2.size();
 
-vector<block> blockPlaintext;
-vector<block> blockCiphertext;
+vector<block> blockPlaintext; // will contain the block versions of plaintexts
+vector<block> blockCiphertext; // will contain the block versions of ciphertexts
 
+/* Checks if a given set of k0, k1, k2 is suitable for the given plaintext/ciphertext couples. */
 bool verify(block k0, block k1, block k2)
 {
     unsigned i = 0;
@@ -577,20 +578,20 @@ bool verify(block k0, block k1, block k2)
 /* This recursive function explores all the possibilities given by the vector unknownInK2 */
 int bruteforce(unsigned current_unknown, block current_k, block k2)
 {
-    if (current_unknown == total_unknown)
+    if (current_unknown == total_unknown) // we have reached the end of our recursive exploration
     {
 	block k0 = getK0FromK(current_k);
 	block k1 = getK1FromK(current_k);
-	if (verify(k0, k1, k2))
+	if (verify(k0, k1, k2)) // we test the corresponding k0, k1, k2 set
 	    return current_k;
 	else
 	    return (-1);
     }
     else
     {
-	int k = bruteforce(current_unknown + 1, current_k | (1 << (31 - unknownInK2[current_unknown])), k2);
+	int k = bruteforce(current_unknown + 1, current_k | (1 << (31 - unknownInK2[current_unknown])), k2); // we recursively explore the case where k's current unknown bit has been set to 1
 	if (k == -1)
-	    return (bruteforce(current_unknown + 1, current_k & (~(1 << (31 - unknownInK2[current_unknown]))), k2));
+	    return (bruteforce(current_unknown + 1, current_k & (~(1 << (31 - unknownInK2[current_unknown]))), k2)); // if it is not fruitful, we recursively explore the case where k's current unknown bit has been set to 0
 	else
 	    return k;
     }
@@ -598,8 +599,8 @@ int bruteforce(unsigned current_unknown, block current_k, block k2)
 
 block findK(block k2)
 {
-    block initial_k = getBitsFromK2(k2);
-    int k = bruteforce(0, initial_k, k2);
+    block initial_k = getBitsFromK2(k2); // We first deduce all the bits we can from k2...
+    int k = bruteforce(0, initial_k, k2); // ... Then we simply bruteforce the remaining ones
     if (k == -1)
 	throw runtime_error("Failed to find K");
     else
@@ -611,9 +612,9 @@ int main ()
 {
     fillL();
 
-    for (auto bits : Plaintext)
+    for (auto bits : Plaintext) // filling of the blockPlaintext vector
 	blockPlaintext.push_back(toBlock(bits));
-    for (auto bits : Ciphertext)
+    for (auto bits : Ciphertext) //filling of the blockCiphertext vector
 	blockCiphertext.push_back(toBlock(bits));
 
 
