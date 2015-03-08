@@ -412,12 +412,9 @@ vector<bit> fromBlock(block b)
     return result;
 }
 
-block findClosestKeyWithOneActiveBox(unsigned position, block a, block b, vector<vector<bit>>& plaintext, vector<vector<bit>>& ciphertext)
+block findClosestKeyWithOneActiveBox(unsigned position, pair<block,block> p)
 {
     // position is the position of the only active box
-
-    if (plaintext.size() != ciphertext.size())
-	throw runtime_error("Plaintext size != Ciphertext size");
     if (position > 7)
 	throw runtime_error("position too large");
 
@@ -428,47 +425,47 @@ block findClosestKeyWithOneActiveBox(unsigned position, block a, block b, vector
     {
 	unsigned proba = 0;
 	block key = permutation(k << 4*(7-position)); // part of the key needed to compute x1 in the active box
-	for (unsigned i = 0; i < plaintext.size(); i++)
-	{
-	    block m = toBlock(plaintext[i]);
-	    block c = toBlock(ciphertext[i]);
-	    block x1 = turnOver(c, key);
 
-	    if (scalarProduct(a,m) == scalarProduct(permutation(b),x1))
+	for (unsigned i = 0; i < Plaintext.size(); i++)
+	{
+	    block m = toBlock(Plaintext[i]);
+	    block c = toBlock(Ciphertext[i]);
+	    block x1 = turnOver(c, key);
+		
+	    if (scalarProduct(p.first << 4*(7-position),m) == scalarProduct(permutation(p.second << 4*(7-position)),x1))
 		proba++;
 	}
-
-	double score = ((double) proba) / plaintext.size();
+	
+	double score = ((double) proba) / Plaintext.size();
 	double diff = min(abs(score - 0.875),abs(score - 0.125));
 
 	if (diff < bestScore)
 	{
 	    bestKey = key;
 	    bestScore = diff;
-	}
+	}	
     }
 
     return bestKey;
 }
-
-block breakWithOneActiveBox(block a, block b, vector<vector<bit>>& plaintext, vector<vector<bit>>& ciphertext)
+				     
+block breakWithOneActiveBox(pair<block,block> p)
 {
     block key = 0;
 
     for (unsigned i = 0; i < 8; i++)
-	key += findClosestKeyWithOneActiveBox(7-i, a<<4*i, b<<4*i, plaintext, ciphertext);
+	key += findClosestKeyWithOneActiveBox(i, p);
 
     return key;
 }
 
-block findClosestKeyWithTwoActiveBoxes(unsigned position, block a, block b, vector<vector<bit>>& plaintext, vector<vector<bit>>& ciphertext)
+block findClosestKeyWithTwoActiveBoxes(unsigned position, pair<block,block> p)
 {
     // position is the position of the active box, postion+1 being the position of the second one
-
-    if (plaintext.size() != ciphertext.size())
-	throw runtime_error("Plaintext size != Ciphertext size");
-    if (position > 6)
+    if (position > 7)
 	throw runtime_error("position too large");
+    if (position % 2 == 1)
+	throw runtime_error("position odd (should be even)");
 
     block bestKey = 0; // best current guess for the part of K2 considered
     double bestScore = 1; // difference of probabilities between theory and our best key
@@ -476,20 +473,20 @@ block findClosestKeyWithTwoActiveBoxes(unsigned position, block a, block b, vect
     for (block k = 0; k < 256; k++)
     {
 	unsigned proba = 0;
-	block key = k << 4*(7-(position+1)); // part of the key needed to compute x1 in the active box
-	for (unsigned i = 0; i < plaintext.size(); i++)
+	block key = permutation(k << 4*(7-(position+1))); // part of the key needed to compute x1 in the active box
+	for (unsigned i = 0; i < Plaintext.size(); i++)
 	{
-	    block m = toBlock(plaintext[i]);
-	    block c = toBlock(ciphertext[i]);
+	    block m = toBlock(Plaintext[i]);
+	    block c = toBlock(Ciphertext[i]);
 	    block x1 = turnOver(c, key);
 
-	    if (scalarProduct(a,m) == scalarProduct(permutation(b),x1))
+	    if (scalarProduct(p.first << 4*(7-position),m) == scalarProduct(permutation(p.second << 4*(7-position)),x1))
 		proba++;
 	}
-
-	double score = ((double) proba) / plaintext.size();
+	
+	double score = ((double) proba) / Plaintext.size();
 	double diff = min(abs(score - 0.875),abs(score - 0.125));
-
+	
 	if (diff < bestScore)
 	{
 	    bestKey = key;
@@ -500,12 +497,12 @@ block findClosestKeyWithTwoActiveBoxes(unsigned position, block a, block b, vect
     return bestKey;
 }
 
-block breakWithTwoActiveBoxes(block a, block b, vector<vector<bit>>& plaintext, vector<vector<bit>>& ciphertext)
+block breakWithTwoActiveBoxes(pair<block,block> p)
 {
     block key = 0;
 
     for (unsigned i = 0; i < 4; i++)
-	key += findClosestKeyWithTwoActiveBoxes(7-(2*i+1), a<<4*(2*i+1), b<<4*(2*i+1), plaintext, ciphertext);
+	key += findClosestKeyWithTwoActiveBoxes(2*i, p);
 
     return key;
 }
@@ -517,44 +514,44 @@ vector<unsigned> k2FromK = { 4, 24, 23, 12, 22, 21, 31, 15, 29, 1, 0, 26, 17, 24
 
 block getK0FromK(block k)
 {
-  block k0 = 0;
-  block mask = 1 << 31;
-  for (unsigned position : k0FromK)
+    block k0 = 0;
+    block mask = 1 << 31;
+    for (unsigned position : k0FromK)
     {
-      if (k >> (31 - position) & 1)
-	k0 |= mask;
-      mask = mask >> 1;
+	if (k >> (31 - position) & 1)
+	    k0 |= mask;
+	mask = mask >> 1;
     }
-  return k0;
+    return k0;
 }
 
 block getK1FromK(block k)
 {
-  block k1 = 0;
-  block mask = 1 << 31;
-  for (unsigned position : k1FromK)
+    block k1 = 0;
+    block mask = 1 << 31;
+    for (unsigned position : k1FromK)
     {
-      if (k >> (31 - position) & 1)
-	k1 |= mask;
-      mask = mask >> 1;
+	if (k >> (31 - position) & 1)
+	    k1 |= mask;
+	mask = mask >> 1;
     }
-  return k1;
+    return k1;
 }
 
 /* Retrieves all the bits that can be deduced from k2. Unknown bits are left to 0. */
 block getBitsFromK2(block k2)
 {
-  block k = 0;
-  block mask = 1 << 31;
-  for (unsigned position : k2FromK)
+    block k = 0;
+    block mask = 1 << 31;
+    for (unsigned position : k2FromK)
     {
-      if (k2 & mask)
+	if (k2 & mask)
 	{
-	  k |= 1 << (31 - position);
+	    k |= 1 << (31 - position);
 	}
-      mask = mask >> 1;
+	mask = mask >> 1;
     }
-  return k;
+    return k;
 }
 
 
@@ -566,47 +563,47 @@ vector<block> blockCiphertext;
 
 bool verify(block k0, block k1, block k2)
 {
-  unsigned i = 0;
-  bool found = true;
-  while (found && i < blockPlaintext.size())
+    unsigned i = 0;
+    bool found = true;
+    while (found && i < blockPlaintext.size())
     {
-      if (decryption(blockCiphertext[i], k0, k1, k2) != blockPlaintext[i])
-	found = false;
-      i++;
+	if (decryption(blockCiphertext[i], k0, k1, k2) != blockPlaintext[i])
+	    found = false;
+	i++;
     }
-  return found;
+    return found;
 }
 
 /* This recursive function explores all the possibilities given by the vector unknownInK2 */
 int bruteforce(unsigned current_unknown, block current_k, block k2)
 {
-  if (current_unknown == total_unknown)
+    if (current_unknown == total_unknown)
     {
-      block k0 = getK0FromK(current_k);
-      block k1 = getK1FromK(current_k);
-      if (verify(k0, k1, k2))
-	return current_k;
-      else
-	return (-1);
+	block k0 = getK0FromK(current_k);
+	block k1 = getK1FromK(current_k);
+	if (verify(k0, k1, k2))
+	    return current_k;
+	else
+	    return (-1);
     }
-  else
+    else
     {
-      int k = bruteforce(current_unknown + 1, current_k | (1 << (31 - unknownInK2[current_unknown])), k2);
-      if (k == -1)
-	return (bruteforce(current_unknown + 1, current_k & (~(1 << (31 - unknownInK2[current_unknown]))), k2));
-      else
-	return k;
+	int k = bruteforce(current_unknown + 1, current_k | (1 << (31 - unknownInK2[current_unknown])), k2);
+	if (k == -1)
+	    return (bruteforce(current_unknown + 1, current_k & (~(1 << (31 - unknownInK2[current_unknown]))), k2));
+	else
+	    return k;
     }
 }
 
 block findK(block k2)
 {
-  block initial_k = getBitsFromK2(k2);
-  int k = bruteforce(0, initial_k, k2);
-  if (k == -1)
-    throw runtime_error("Failed to find K");
-  else
-    return k;
+    block initial_k = getBitsFromK2(k2);
+    int k = bruteforce(0, initial_k, k2);
+    if (k == -1)
+	throw runtime_error("Failed to find K");
+    else
+	return k;
 }
 
 // Main
@@ -615,9 +612,9 @@ int main ()
     fillL();
 
     for (auto bits : Plaintext)
-      blockPlaintext.push_back(toBlock(bits));
+	blockPlaintext.push_back(toBlock(bits));
     for (auto bits : Ciphertext)
-      blockCiphertext.push_back(toBlock(bits));
+	blockCiphertext.push_back(toBlock(bits));
 
 
     block m = 0;
@@ -656,54 +653,49 @@ int main ()
     cout << "\nQuestion 4 :\n";
     cout << "This code has been commented, since the computation is a bit long: we have chosen to compute the exact probability (2^32 is not too large)" << endl;
     /*  for (auto p : farthest)
-      cout << experimentalTest(p.first << 28, p.second << 28, k0, k1) << endl;
+	cout << experimentalTest(p.first << 28, p.second << 28, k0, k1) << endl;
 
-      for (auto p : farthest)
-      cout << experimentalTest(p.first << 28, p.second << 28, k1, k2) << endl;
+	for (auto p : farthest)
+	cout << experimentalTest(p.first << 28, p.second << 28, k1, k2) << endl;
     */
 
     cout << "\nQuestion 5-6-7-8:\n";
-    vector<block> potentialK2s;
-
     // (4,8), (9,4) and (13,12) are couples giving only one active box
     cout << "Method with one active box:\n";
-    cout << "With (4,8), working on the first position, we find the bits 2,3,4,5 (beginning in the left with 0th bit) of k2 : " << bin_repr(findClosestKeyWithOneActiveBox(0, 4<<28, 8<<28, Plaintext, Ciphertext)) << endl;
+    vector<pair<block,block> > couplesOneBox;
+    couplesOneBox.push_back(pair<block,block> (4,8));
+    couplesOneBox.push_back(pair<block,block> (9,4));
+    couplesOneBox.push_back(pair<block,block> (13,12));
 
-    potentialK2s.push_back(breakWithOneActiveBox(4, 8, Plaintext, Ciphertext));
-    potentialK2s.push_back(breakWithOneActiveBox(9, 4, Plaintext, Ciphertext));
-    potentialK2s.push_back(breakWithOneActiveBox(13, 12, Plaintext, Ciphertext));
+    cout << "Working on the first position, we find the bits 2,3,4,5 (beginning in the left with 0th bit) of k2 : " << bin_repr(findClosestKeyWithOneActiveBox(0, couplesOneBox[0])) << endl;
+    cout << "In all, we find k2 = " << bin_repr(breakWithOneActiveBox(couplesOneBox[0])) << endl;
 
-    cout << "With (4,8), we find k2 = " << bin_repr(potentialK2s[0]) << endl;
-    cout << "With (9,4), we find k2 = " << bin_repr(potentialK2s[1]) << endl;
-    cout << "With (13,12), we find k2 = " << bin_repr(potentialK2s[2]) << endl;
 
     // (1,5), (3,15), (7,7) and (10,11) are couples giving two active boxes
     cout << "\nMethod with two active boxes:\n";
-    cout << "With (1,5), working on the first position, we find the bits 0,...,7 (beginning in the left with 0th bit) of k2 : " << bin_repr(findClosestKeyWithTwoActiveBoxes(0, 1<<28, 5<<28, Plaintext, Ciphertext)) << endl;
+    vector<pair<block,block> > couplesTwoBoxes;
 
-    potentialK2s.push_back(breakWithTwoActiveBoxes(1, 5, Plaintext, Ciphertext));
-    potentialK2s.push_back(breakWithTwoActiveBoxes(3, 15, Plaintext, Ciphertext));
-    potentialK2s.push_back(breakWithTwoActiveBoxes(7, 7, Plaintext, Ciphertext));
-    potentialK2s.push_back(breakWithTwoActiveBoxes(10, 11, Plaintext, Ciphertext));
-
-    cout << "With (1,5), we find k2 = " << bin_repr(potentialK2s[3]) << endl;
-    cout << "With (3,15), we find k2 = " << bin_repr(potentialK2s[4]) << endl;
-    cout << "With (7,7), we find k2 = " << bin_repr(potentialK2s[5]) << endl;
-    cout << "With (10,11), we find k2 = " << bin_repr(potentialK2s[6]) << endl;
+    couplesTwoBoxes.push_back(pair<block,block> (1,5));
+    couplesTwoBoxes.push_back(pair<block,block> (3,15));
+    couplesTwoBoxes.push_back(pair<block,block> (7,7));
+    couplesTwoBoxes.push_back(pair<block,block> (10,11));
+    
+    cout << "Working on the first position, we find the bits 0,...,7 (beginning in the left with 0th bit) of k2 : " << bin_repr(findClosestKeyWithTwoActiveBoxes(0, couplesTwoBoxes[3])) << endl;
+    cout << "In all, we find k2 = " << bin_repr(breakWithTwoActiveBoxes(couplesTwoBoxes[3])) << endl;
 
     cout << "\nQuestion 9:\n";
-
-    block k = findK(potentialK2s[0]);
+    block k2test = breakWithOneActiveBox(couplesOneBox[0]);
+    block k = findK(k2test);
 
     cout << "We find k = " << bin_repr(k) << endl <<
-            "Consequently, " << endl <<
-            "k0 = " << bin_repr(getK0FromK(k)) << endl <<
-            "k1 = " << bin_repr(getK1FromK(k)) << endl <<
-            "k2 = " << bin_repr(potentialK2s[0]) << endl;
+	"Consequently, " << endl <<
+	"k0 = " << bin_repr(getK0FromK(k)) << endl <<
+	"k1 = " << bin_repr(getK1FromK(k)) << endl <<
+	"k2 = " << bin_repr(k2test) << endl;
 
 
 
     //cout << verify(0b10001101101101100011010011001100, 0b00100011101000100001011100000111, 0b10011100000110110001100110100100) << endl;
 
-   return 0;
+    return 0;
 }
