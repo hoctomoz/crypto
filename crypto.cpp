@@ -514,7 +514,8 @@ vector<unsigned> k0FromK = { 17, 31, 0, 0, 18, 7, 20, 18, 8, 1, 27, 27, 2, 4, 11
 vector<unsigned> k1FromK = { 15, 2, 5, 0, 13, 31, 5, 10, 18, 2, 3, 14, 1, 0, 11, 1, 20, 15, 14, 27, 6, 11, 19, 3, 6, 20, 14, 2, 28, 11, 5, 8 };
 vector<unsigned> k2FromK = { 4, 24, 23, 12, 22, 21, 31, 15, 29, 1, 0, 26, 17, 24, 16, 5, 31, 0, 20, 21, 26, 30, 15, 11, 16, 23, 18, 30, 30, 19, 28, 23 };
 
-vector<unsigned> unknownsInK2 = {2, 3, 6, 7, 8, 9, 10, 13, 14, 25, 27};
+vector<unsigned> unknownInK2 = {2, 3, 6, 7, 8, 9, 10, 13, 14, 25, 27};
+unsigned total_unknown = unknownInK2.size();
 
 vector<block> blockPlaintext(Plaintext.size());
 vector<block> blockCiphertext(Ciphertext.size());
@@ -531,12 +532,25 @@ block verify(block k0, block k1, block k2)
   return found;
 }
 
+/* Retrieves all the bits that can be deduced from k2. Unknown bits are left to 0. */
 block getBitsFromK2(block k2)
 {
   block k = 0;
   for (unsigned position : k2FromK)
       k = k | (1 << position);
   return k;
+}
+
+block bruteforce(unsigned current_unknown, block current_k, block k2)
+{
+  if (current_unknown == total_unknown)
+    {
+      k0 = k0FromK(current_k);
+      k1 = k1FromK(current_k);
+
+
+    }
+
 }
 
 block findK(block m, block c, block k2)
@@ -619,6 +633,7 @@ int main ()
 
     cout << "Test" << endl;
     cout << bin_repr(getBitsFromK2(0xFFFFFFFF)) << endl;
+    //cout << verify()
 
    return 0;
 }
