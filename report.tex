@@ -3,9 +3,13 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 
-\author{Paul Fermé \and Léo Exibard}
+\date{March 8, 2015}
+\author{Léo Exibard \and Paul Fermé}
+\title{Cryptography: TP 1}
 
 \begin{document}
+
+\maketitle
 
 \paragraph{Question 2}
 
@@ -163,7 +167,7 @@ A.m = P(B).x_1 \text{ w.p. } \dfrac{1}{2} \pm \dfrac{6}{16}
 
 \paragraph{Question 5}
 
-By just focusing on the active boxes, we can determine locally some bits of $K_2$, hence reducing the search space.
+By just focusing on the active boxes, we can determine locally some bits of $K_2$, hence reducing the search space. To do so, we hypothesize the bits of the active boxes shifted from 2 to the right, then we reverse the last turn to get the corresponding $x_1$. Then, we evaluate the probability $A.m = P(B).x_1$, and we compare it with $\dfrac{1}{2} \pm \dfrac{6}{16}$. Finally, we chose the $K_2$ that minimizes the distance between the experimental probability and the two probabilities $\dfrac{1}{2} \pm \dfrac{6}{16}$.
 
 \paragraph{Question 6}
 
@@ -209,15 +213,17 @@ We get the following table:
 \end{equation*}
 
 \paragraph{Question 7}
-With one active box, working on the first position with the couple (4,8), we find the bits 2,3,4,5 of k2 : 0111.
+With one active box, working on the first position with the couple (4,8), we find the bits 2,3,4,5 of $K_2$ : 0111.
 
-With two active boxes, working on the first position with the couple (10,11), we find the bits 2,...,9 of k2 : 01110000.
+With two active boxes, working on the first position with the couple (10,11), we find the bits 2,...,9 of $K_2$ : 01110000.
 
 \paragraph{Question 8}
 With one active box with the couple (4,8) or with two active boxes with the couple
-(10,11), we find k2 = 10011100000110110001100110100100.
+(10,11), we find $K_2$ = 10011100000110110001100110100100.
 (We have other values with the other couples, but the last step of the algorithm (question
-9) shows that this only value of k2 works).
+9) shows that this only value of $K_2$ works).
+
+The method with one active box costs $\mathcal{O}(8 \times 16)$ operations whereas the one with two active boxes costs $\mathcal{O}(4 \times 256)$, which is less efficient.
 
 \paragraph{Question 9}
 
