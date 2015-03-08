@@ -5,7 +5,7 @@
 #include <vector>
 #include <utility>
 #include <cmath>
-#include <stdexcept> 
+#include <stdexcept>
 
 using namespace std;
 typedef uint32_t block;
@@ -515,6 +515,26 @@ vector<unsigned> k0FromK = { 17, 31, 0, 0, 18, 7, 20, 18, 8, 1, 27, 27, 2, 4, 11
 vector<unsigned> k1FromK = { 15, 2, 5, 0, 13, 31, 5, 10, 18, 2, 3, 14, 1, 0, 11, 1, 20, 15, 14, 27, 6, 11, 19, 3, 6, 20, 14, 2, 28, 11, 5, 8 };
 vector<unsigned> k2FromK = { 4, 24, 23, 12, 22, 21, 31, 15, 29, 1, 0, 26, 17, 24, 16, 5, 31, 0, 20, 21, 26, 30, 15, 11, 16, 23, 18, 30, 30, 19, 28, 23 };
 
+block getK0FromK(block k)
+{
+  block k0 = 0;
+  for (unsigned position : k0FromK)
+    {
+      k0 = k0 | (k & (1 << position));
+    }
+  return k0;
+}
+
+block getK1FromK(block k)
+{
+  block k1 = 0;
+  for (unsigned position : k1FromK)
+    {
+      k1 = k1 | (k & (1 << position));
+    }
+  return k1;
+}
+
 vector<unsigned> unknownInK2 = {2, 3, 6, 7, 8, 9, 10, 13, 14, 25, 27};
 unsigned total_unknown = unknownInK2.size();
 
@@ -542,15 +562,16 @@ block getBitsFromK2(block k2)
   return k;
 }
 
+/* This recursive function explores all the possibilities given by the vector unknownInK2 */
 block bruteforce(unsigned current_unknown, block current_k, block k2)
 {
+  //TODO
   if (current_unknown == total_unknown)
     {
-      k0 = k0FromK(current_k);
-      k1 = k1FromK(current_k);
-
-
+      block k0 = getK0FromK(current_k);
+      block k1 = getK1FromK(current_k);
     }
+  return 0;
 
 }
 
@@ -626,7 +647,7 @@ int main ()
     potentialK2s.push_back(breakWithOneActiveBox(4, 8, Plaintext, Ciphertext));
     potentialK2s.push_back(breakWithOneActiveBox(9, 4, Plaintext, Ciphertext));
     potentialK2s.push_back(breakWithOneActiveBox(13, 12, Plaintext, Ciphertext));
-    
+
     cout << "With (4,8), we find k2 = " << bin_repr(potentialK2s[0]) << endl;
     cout << "With (9,4), we find k2 = " << bin_repr(potentialK2s[1]) << endl;
     cout << "With (13,12), we find k2 = " << bin_repr(potentialK2s[2]) << endl;
@@ -639,7 +660,7 @@ int main ()
     potentialK2s.push_back(breakWithTwoActiveBoxes(3, 15, Plaintext, Ciphertext));
     potentialK2s.push_back(breakWithTwoActiveBoxes(7, 7, Plaintext, Ciphertext));
     potentialK2s.push_back(breakWithTwoActiveBoxes(10, 11, Plaintext, Ciphertext));
-  
+
     cout << "With (1,5), we find k2 = " << bin_repr(potentialK2s[3]) << endl;
     cout << "With (3,15), we find k2 = " << bin_repr(potentialK2s[4]) << endl;
     cout << "With (7,7), we find k2 = " << bin_repr(potentialK2s[5]) << endl;
